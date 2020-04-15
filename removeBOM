@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @author rawsrc
+ *
+ * This function just reads the 3 first octets of a file and
+ * if a BOM is detected then
+ * - copy the file octet by octet dropping the BOM
+ * - rename the original (add extension .old)
+ * - rename the new file (without the BOM) using the original name
+ *
+ * @param string $file
+ */
+function removeBOM(string $file)
+{
+    $random_name = function() use ($file) {
+        $alpha = range('a', 'z');
+        shuffle($alpha);
+        $alpha = implode('', $alpha);
+        return basename($file).substr($alpha, 0, mt_rand(5, 10)).rand(100000, 999999);
+    };
+
+    if (is_file($file)) {
+        $bom = "\xef\xbb\xbf";
+        $fh  = fopen($file, 'r');
+        $oct = fread($fh, 3);   // read 3 first octets
+        if ($oct === $bom) {    // BOM detected
+            $temp = dirname($file).DIRECTORY_SEPARATOR.$random_name();
+            $size = filesize($file);
+            $fc   = fopen($temp, 'w');
+            // copy the file octet by octet starting after the BOM
+            for ($i = 3 ; $i < $size ; ++$i) {
+                fseek($fh, $i);
+                fwrite($fc, fgetc($fh));
+            }
+            fclose($fc);
+        }
+        fclose($fh);
+        // rename and keep the old one
+        if ($oct === $bom) {
+            rename($file, "{$file}.old");
+            rename($temp, $file);
+        }
+    }
+}
