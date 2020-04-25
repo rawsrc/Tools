@@ -6,7 +6,7 @@
  * This function just reads the 3 first octets of a file and
  * if a BOM is detected then
  * - copy the file octet by octet dropping the BOM
- * - rename the original (add extension .old)
+ * - rename the original (add extension .withbom)
  * - rename the new file (without the BOM) using the original name
  *
  * @param string $file
@@ -38,7 +38,7 @@ function removeBOM(string $file)
         fclose($fh);
         // rename and keep the old one
         if ($oct === $bom) {
-            rename($file, "{$file}.old");
+            rename($file, "{$file}.withbom");
             rename($temp, $file);
         }
     }
