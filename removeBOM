@@ -14,9 +14,7 @@
 function removeBOM(string $file)
 {
     $random_name = function() use ($file) {
-        $alpha = range('a', 'z');
-        shuffle($alpha);
-        $alpha = implode('', $alpha);
+        $alpha = str_shuffle(implode('',range('a', 'z')));
         return basename($file).substr($alpha, 0, mt_rand(5, 10)).rand(100000, 999999);
     };
 
